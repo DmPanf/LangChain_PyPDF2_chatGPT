@@ -16,6 +16,7 @@ Meet PDF-QuestionBot, a remarkable amalgamation of AI magic and PDF manipulation
 
 - **Python**: The backbone of our bot, providing the flexibility and power we need.
 - **Telegram API**: For smooth and secure bot-user interactions.
+- **LangChain**: A robust chaining library that adds a layer of language understanding, enhancing the bot's conversational abilities.
 - **GPT-4**: State-of-the-art NLP model for generating human-like text.
 - **PDFMiner**: For reliable and efficient PDF text extraction.
 - **Docker**: Containerization for easy deployment and scaling.
