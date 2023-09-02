@@ -3,10 +3,17 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.types import ParseMode
 from aiogram.utils import executor
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from dotenv import load_dotenv
-from PyPDF2 import PdfReader
-import os
+import asyncio
 import logging
+from langchain.text_splitter import CharacterTextSplitter
+from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.vectorstores import FAISS
+from langchain.chains.question_answering import load_qa_chain
+from langchain.llms import OpenAI
+from langchain.callbacks import get_openai_callback
+from PyPDF2 import PdfReader
+from dotenv import load_dotenv
+import os
 
 load_dotenv()
 API_TOKEN = os.getenv('API_TOKEN')
@@ -25,21 +32,52 @@ async def cmd_start(message: types.Message):
     await Form.name.set()
     await message.reply("Hi! Send me a PDF file.")
 
-@dp.message_handler(content_types=['document'], state=Form.name)
-async def process_pdf(message: types.Message, state: FSMContext):
-    pdf = await bot.download_file_by_id(message.document.file_id, destination='yourfile.pdf')
-    
-    pdf_reader = PdfReader('yourfile.pdf')
+async def process_pdf_and_question(pdf_path: str, user_question: str) -> str:
+    # Extract the text
+    pdf_reader = PdfReader(pdf_path)
     text = ""
     for page in pdf_reader.pages:
         text += page.extract_text()
-
-    await bot.send_message(
-        message.chat.id,
-        "Your processed information here",
-        parse_mode=ParseMode.HTML,
+    
+    # Split into chunks
+    text_splitter = CharacterTextSplitter(
+        separator="\n",
+        chunk_size=1000,
+        chunk_overlap=200,
+        length_function=len
     )
-    await state.finish()
+    chunks = text_splitter.split_text(text)
+    
+    # Create embeddings
+    embeddings = OpenAIEmbeddings()
+    knowledge_base = FAISS.from_texts(chunks, embeddings)
+    
+    # Perform similarity search
+    docs = knowledge_base.similarity_search(user_question)
+    
+    llm = OpenAI()
+    chain = load_qa_chain(llm, chain_type="stuff")
+    with get_openai_callback() as cb:
+        response = chain.run(input_documents=docs, question=user_question)
+    return response
+
+@dp.message_handler(lambda message: message.text.startswith('/question'), state='*')
+async def process_question(message: types.Message, state: FSMContext):
+    user_question = message.text[len('/question '):]
+    async with state.proxy() as data:
+        pdf_path = data.get('pdf_path')
+        if not pdf_path:
+            await message.reply("First, upload a PDF file.")
+            return
+        response = await process_pdf_and_question(pdf_path, user_question)
+        await message.reply(f"Answer: {response}")
+
+@dp.message_handler(content_types=['document'], state='*')
+async def process_pdf(message: types.Message, state: FSMContext):
+    pdf_path = f"{message.document.file_id}.pdf"
+    await bot.download_file_by_id(message.document.file_id, destination=pdf_path)
+    await state.update_data(pdf_path=pdf_path)
+    await message.reply("PDF received! Now ask a question using the /question command.")
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
