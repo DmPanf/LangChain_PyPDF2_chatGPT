@@ -1,0 +1,6 @@
+version: '3'
+services:
+  pdf_bot:
+    build: .
+    volumes:
+      - ./data:/app/data
