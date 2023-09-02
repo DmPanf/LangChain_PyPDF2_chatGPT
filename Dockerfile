@@ -9,7 +9,7 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 # Copy the bot script into the image
-COPY bot.py .
+COPY . .
 
 # Run the bot script
 CMD ["python", "bot.py"]
