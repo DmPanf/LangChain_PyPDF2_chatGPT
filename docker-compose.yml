@@ -1,6 +1,8 @@
-version: '3'
+version: '3.1'
+
 services:
-  pdf_bot:
+  pdf-tg-bot:
     build: .
     volumes:
-      - ./data:/app/data
+      - ./data:/app/data  # Для хранения PDF файлов
+    command: python aiogram_bot.py
