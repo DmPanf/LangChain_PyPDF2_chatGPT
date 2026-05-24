@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m py_compile main.py rag.py llm.py)",
+      "Bash(py -3 -m py_compile main.py rag.py llm.py)",
+      "PowerShell(py -3 -m py_compile main.py rag.py llm.py)",
+      "PowerShell(if \\($LASTEXITCODE -eq 0\\) { \"OK: syntax clean\" } else { \"FAILED\" })",
+      "Bash(docker run *)",
+      "PowerShell(docker run --rm -v \"${PWD}:/app\" -w /app python:3.11-slim python -m py_compile main.py rag.py llm.py; if \\($LASTEXITCODE -eq 0\\) { \"PYCHECK_OK\" } else { \"PYCHECK_FAIL\" })",
+      "PowerShell(if \\(-not \\(Test-Path .env\\)\\) { Copy-Item .env.example .env; \"Created .env from .env.example \\(заполните ключи перед запросами в чат\\)\" } else { \".env уже существует\" })",
+      "Read(//c/Users/dmp/AppData/Local/Temp/claude/C--Users-dmp-Documents-Python-Projects------RAG/1ae42089-07ae-4be8-aa98-bcc997f0abb5/tasks/**)",
+      "Bash(curl -fsS http://localhost:8800/api/health)",
+      "Read(//tmp/**)",
+      "Bash(curl -sI http://localhost:8800/)",
+      "Bash(curl -sI http://localhost:8800/static/hero.png)",
+      "Bash(curl -s http://localhost:8800/)",
+      "Bash(until curl -fsS http://localhost:8800/api/health > /tmp/h.json 2>/dev/null; do sleep 2; done *)",
+      "Bash(curl -s http://localhost:8800/api/health)",
+      "Bash(curl -sS -X POST http://localhost:8800/chat -H \"Content-Type: application/json\" -d '{\"message\":\"привет\",\"history\":[]}')",
+      "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('chunks:',len\\(d['chunks']\\),'model:',d.get\\('llm_model_used'\\),'err:',d.get\\('llm_error'\\)\\)\")",
+      "Bash(curl -sS -X POST http://localhost:8800/chat -H \"Content-Type: application/json\" -d '{\"message\":\"привет\",\"history\":[]}' -o /tmp/r.json)"
+    ]
+  }
+}

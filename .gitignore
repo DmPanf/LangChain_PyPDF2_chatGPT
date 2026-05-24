@@ -1,0 +1,14 @@
+.env
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+.pytest_cache/
+.idea/
+.vscode/
+*.log
+leads.json
+hf_cache/
+.DS_Store
+# embeddings_cache.npz коммитим — ускоряет первый старт на Replit

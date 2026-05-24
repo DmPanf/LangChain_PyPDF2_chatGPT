@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI-консультант по быстровозводимым домам · ЭкоДомСтрой</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="bg-animated">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    <div class="grid-overlay"></div>
+    <div class="leaves" id="leaves"></div>
+    <div class="particles" id="particles"></div>
+  </div>
+
+  <header class="topbar">
+    <div class="brand">
+      <svg class="brand-icon" viewBox="0 0 32 32" aria-hidden="true">
+        <path d="M4 16 L16 4 L28 16 V28 H4 Z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/>
+        <path d="M13 28 V19 H19 V28" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/>
+      </svg>
+      <div>
+        <div class="brand-title">ЭкоДомСтрой</div>
+        <div class="brand-sub">AI-консультант</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle" id="theme-toggle" aria-label="Переключить тему" title="Светлая / тёмная">
+        <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <circle cx="12" cy="12" r="4.5" fill="currentColor"/>
+          <g stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <line x1="12" y1="2" x2="12" y2="4.5"/>
+            <line x1="12" y1="19.5" x2="12" y2="22"/>
+            <line x1="2" y1="12" x2="4.5" y2="12"/>
+            <line x1="19.5" y1="12" x2="22" y2="12"/>
+            <line x1="4.5" y1="4.5" x2="6.3" y2="6.3"/>
+            <line x1="17.7" y1="17.7" x2="19.5" y2="19.5"/>
+            <line x1="4.5" y1="19.5" x2="6.3" y2="17.7"/>
+            <line x1="17.7" y1="6.3" x2="19.5" y2="4.5"/>
+          </g>
+        </svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <path d="M20 14.5 A8 8 0 0 1 9.5 4 A8.5 8.5 0 1 0 20 14.5 Z" fill="currentColor"/>
+        </svg>
+      </button>
+      <div class="status" id="status">
+        <span class="dot"></span><span id="status-text">Готов к диалогу</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="chat-card">
+      <div class="chat-header">
+        <div class="chat-header-text">
+          <h1>AI-консультант по быстровозводимым домам</h1>
+          <p>Задайте вопрос о проектах, ценах, сроках, материалах и условиях строительства.</p>
+        </div>
+        <img src="/static/hero.png" alt="" class="hero-img" onerror="this.style.display='none'" />
+      </div>
+
+      {% if index_error %}
+      <div class="error-banner">
+        ⚠ База знаний не загрузилась: {{ index_error }}
+      </div>
+      {% endif %}
+
+      <div class="chat-window" id="chat-window">
+        <div class="msg msg-assistant">
+          <div class="msg-avatar">AI</div>
+          <div class="msg-bubble">
+            <div class="msg-text">{{ welcome_message }}</div>
+          </div>
+        </div>
+        <div class="quick-questions" id="quick-questions">
+          <div class="qq-label">Популярные вопросы:</div>
+          <div class="qq-chips">
+            <button type="button" class="qq-chip" data-q="Какие типы домов вы строите?">Какие типы домов вы строите?</button>
+            <button type="button" class="qq-chip" data-q="Сколько стоит каркасный дом?">Сколько стоит каркасный дом?</button>
+            <button type="button" class="qq-chip" data-q="Какие сроки строительства?">Какие сроки строительства?</button>
+            <button type="button" class="qq-chip" data-q="Можно ли строить зимой?">Можно ли строить зимой?</button>
+            <button type="button" class="qq-chip" data-q="Какие гарантии вы даёте?">Какие гарантии вы даёте?</button>
+            <button type="button" class="qq-chip" data-q="Есть ли сейчас акции и скидки?">Есть ли сейчас акции и скидки?</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-toolbar">
+        <button type="button" class="chat-clear" id="chat-clear" title="Очистить чат">
+          <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+            <path d="M3 6 H21 M8 6 V4 A1 1 0 0 1 9 3 H15 A1 1 0 0 1 16 4 V6 M5 6 L6 20 A2 2 0 0 0 8 22 H16 A2 2 0 0 0 18 20 L19 6 M10 11 V17 M14 11 V17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Очистить чат</span>
+        </button>
+        <div class="char-counter" id="char-counter">0 / 1000</div>
+      </div>
+      <form class="chat-input" id="chat-form" autocomplete="off">
+        <input
+          type="text"
+          id="chat-message"
+          placeholder="Например: хочу недорогой дом для дачи..."
+          maxlength="1000"
+          required
+        />
+        <button type="submit" id="chat-send">
+          <span>Отправить</span>
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+            <path d="M3 12 L21 4 L13 21 L11 13 Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </form>
+    </section>
+
+    <aside class="lead-card">
+      <div class="lead-header">
+        <h2>Оставить заявку</h2>
+        <p>Менеджер свяжется с вами и подберёт проект.</p>
+      </div>
+
+      <form class="lead-form" id="lead-form" autocomplete="on">
+        <label>
+          <span>Имя</span>
+          <input type="text" name="name" id="lead-name" placeholder="Иван Иванов" required maxlength="120" />
+        </label>
+        <label>
+          <span>E-mail</span>
+          <input type="email" name="email" id="lead-email" placeholder="ivan@example.com" required maxlength="200" />
+        </label>
+        <label>
+          <span>Телефон</span>
+          <input type="tel" name="phone" id="lead-phone" placeholder="+7 ___ ___-__-__" required maxlength="40" />
+        </label>
+        <button type="submit" id="lead-submit">Оставить заявку</button>
+        <div class="lead-result" id="lead-result"></div>
+      </form>
+
+      <div class="lead-perks">
+        <div class="perk"><span>🏠</span> Более 50 типовых проектов</div>
+        <div class="perk"><span>⚡</span> Сроки от 14 дней</div>
+        <div class="perk"><span>🛡</span> Гарантия 5 лет</div>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="footer">
+    RAG · sentence-transformers · OpenRouter
+  </footer>
+
+  <div class="modal-backdrop" id="lead-modal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <button class="modal-close" id="modal-close" aria-label="Закрыть">×</button>
+      <div class="modal-icon">
+        <svg viewBox="0 0 64 64" width="56" height="56" aria-hidden="true">
+          <circle cx="32" cy="32" r="28" fill="none" stroke="currentColor" stroke-width="3" class="modal-icon-ring"/>
+          <path d="M20 33 L29 42 L46 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" class="modal-icon-check"/>
+        </svg>
+      </div>
+      <h3 id="modal-title">Заявка принята!</h3>
+      <p class="modal-sub">Спасибо за обращение. Мы свяжемся с вами в ближайшее время.</p>
+      <dl class="modal-details">
+        <div><dt>Номер заявки</dt><dd id="m-id">—</dd></div>
+        <div><dt>Дата и время</dt><dd id="m-ts">—</dd></div>
+        <div><dt>Получатель</dt><dd id="m-rcp">—</dd></div>
+        <div><dt>Имя</dt><dd id="m-name">—</dd></div>
+        <div><dt>E-mail</dt><dd id="m-email">—</dd></div>
+        <div><dt>Телефон</dt><dd id="m-phone">—</dd></div>
+      </dl>
+      <button class="modal-ok" id="modal-ok">Отлично, спасибо</button>
+    </div>
+  </div>
+
+  <script src="/static/app.js" defer></script>
+</body>
+</html>
